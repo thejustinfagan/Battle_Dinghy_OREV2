@@ -4,165 +4,653 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Join Battle Dinghy</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d2137 100%);
+      min-height: 100vh;
+      color: #e0e6ed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(26, 42, 74, 0.8);
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo h1 {
+      font-size: 2rem;
+      color: #4a90e2;
+      text-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+    }
+
+    .logo .anchor {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .game-info {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .game-id {
+      font-family: monospace;
+      font-size: 1.2rem;
+      color: #ffd700;
+      text-align: center;
+      margin-bottom: 16px;
+      padding: 8px;
+      background: rgba(255, 215, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #8899aa;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #4a90e2;
+    }
+
+    .stat-value.sol {
+      color: #14f195;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .status-badge.waiting {
+      background: rgba(20, 241, 149, 0.2);
+      color: #14f195;
+      border: 1px solid rgba(20, 241, 149, 0.4);
+    }
+
+    .status-badge.active {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid rgba(255, 193, 7, 0.4);
+    }
+
+    .status-badge.completed {
+      background: rgba(108, 117, 125, 0.2);
+      color: #6c757d;
+      border: 1px solid rgba(108, 117, 125, 0.4);
+    }
+
+    .status-badge.error {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.4);
+    }
+
+    .join-section {
+      text-align: center;
+    }
+
+    .join-section h3 {
+      margin-bottom: 16px;
+      color: #c0c8d0;
+    }
+
+    .twitter-section {
+      margin-bottom: 24px;
+    }
+
+    .twitter-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #e0e6ed;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .twitter-input:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+    }
+
+    .wallet-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: white;
+    }
+
+    .wallet-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .wallet-btn.verify {
+      background: linear-gradient(135deg, #1da1f2 0%, #0d8ecf 100%);
+    }
+
+    .wallet-btn.verify:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(29, 161, 242, 0.4);
+    }
+
+    .wallet-btn.phantom {
+      background: linear-gradient(135deg, #ab9ff2 0%, #7c3aed 100%);
+    }
+
+    .wallet-btn.phantom:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    }
+
+    .wallet-btn.solflare {
+      background: linear-gradient(135deg, #fc8c03 0%, #e85d04 100%);
+    }
+
+    .wallet-btn.solflare:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(232, 93, 4, 0.4);
+    }
+
+    .wallet-btn.copy-link {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    }
+
+    .wallet-btn.copy-link:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: #6c757d;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(108, 117, 125, 0.3);
+    }
+
+    .divider span {
+      padding: 0 16px;
+      font-size: 0.85rem;
+    }
+
+    .info-text {
+      text-align: center;
+      color: #8899aa;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .info-text a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .info-text a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .error-message h2 {
+      color: #dc3545;
+      margin-bottom: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(74, 144, 226, 0.3);
+      border-top-color: #4a90e2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #6c757d;
+      font-size: 0.8rem;
+    }
+
+    .footer a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    .copied-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #14f195;
+      color: #0a1628;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 100;
+    }
+
+    .copied-toast.show {
+      opacity: 1;
+    }
+
+    .instructions {
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .instructions ol {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    .instructions li {
+      margin-bottom: 4px;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .step {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(74, 144, 226, 0.2);
+      border: 2px solid rgba(74, 144, 226, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .step.active {
+      background: #4a90e2;
+      border-color: #4a90e2;
+    }
+
+    .step.complete {
+      background: #14f195;
+      border-color: #14f195;
+      color: #0a1628;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .success-message {
+      background: rgba(20, 241, 149, 0.1);
+      border: 1px solid rgba(20, 241, 149, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #14f195;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="text-center">Battle Dinghy</h1>
+    <div class="card">
+      <div class="logo">
+        <span class="anchor">&#9875;</span>
+        <h1>Battle Dinghy</h1>
+      </div>
 
-    <div id="game-info" class="card">
-      <div class="loading">Loading game...</div>
+      <div id="content">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading game info...</p>
+        </div>
+      </div>
     </div>
 
-    <div id="wallet-section" class="card hidden">
-      <h2>Step 1: Connect Wallet</h2>
-      <button id="connect-btn" class="btn primary">Connect Wallet</button>
-      <p id="wallet-address" class="text-secondary mt-4 hidden"></p>
-    </div>
-
-    <div id="twitter-section" class="card hidden">
-      <h2>Step 2: Twitter Handle (optional)</h2>
-      <input type="text" id="twitter-input" placeholder="@username">
-      <p class="text-secondary">For game notifications</p>
-    </div>
-
-    <div id="placement-section" class="card hidden">
-      <h2>Step 3: Place Your Ship</h2>
-      <p id="placement-instructions" class="text-secondary mb-4"></p>
-      <div id="board"></div>
-      <p id="placement-preview" class="text-center mt-4"></p>
-    </div>
-
-    <div id="pay-section" class="card hidden">
-      <h2>Step 4: Pay Entry Fee</h2>
-      <p>Entry: <strong id="entry-fee"></strong> SOL</p>
-      <p class="text-secondary mb-4">You'll be prompted to sign a transaction</p>
-      <button id="pay-btn" class="btn primary large" disabled>Pay & Join</button>
-    </div>
-
-    <div id="success-section" class="card success hidden">
-      <h2>You're In!</h2>
-      <p>Waiting for game to start...</p>
-      <p class="text-secondary">You'll be notified when it begins.</p>
-      <a id="game-link" href="#" class="btn secondary mt-4">View Game</a>
-    </div>
-
-    <div id="error-section" class="card error hidden">
-      <p id="error-message"></p>
+    <div class="footer">
+      Powered by Solana &bull; <a href="https://twitter.com/battle_dinghy" target="_blank">@battle_dinghy</a>
     </div>
   </div>
 
-  <script src="/js/api.js"></script>
-  <script src="/js/wallet-adapter.js"></script>
-  <script src="/js/game-board.js"></script>
+  <div id="toast" class="copied-toast">Link copied!</div>
+
   <script>
     const gameId = window.location.pathname.split('/').pop();
-    let game = null;
-    let board = null;
-    let selectedCells = [];
+    const API_BASE = window.location.origin;
 
-    async function init() {
-      try {
-        game = await api.getGame(gameId);
-        showGameInfo();
-        show('wallet-section');
-      } catch (err) {
-        showError('Game not found');
-      }
+    let verificationToken = null;
+    let verifiedHandle = null;
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    function showGameInfo() {
-      document.getElementById('game-info').innerHTML = `
-        <h2>Game: ${game.id}</h2>
-        <p>Entry: ${game.entryFeeSol} SOL - Players: ${game.playerCount}/${game.maxPlayers}</p>
-        <p>Ship: ${['Tiny Dinghy (1 cell)', 'Mid Ship (2 cells)', 'Giant Vessel (3 cells)'][game.shipSize - 1]}</p>
-        <p>Shots: ${game.shotsPerSalvo} per round - Reposition: ${game.repositionWindowMinutes} min</p>
-      `;
-      document.getElementById('entry-fee').textContent = game.entryFeeSol;
-    }
-
-    document.getElementById('connect-btn').addEventListener('click', async () => {
-      try {
-        const wallet = await connectWallet();
-        document.getElementById('wallet-address').textContent = `Connected: ${wallet.publicKey.slice(0, 8)}...`;
-        document.getElementById('wallet-address').classList.remove('hidden');
-        document.getElementById('connect-btn').textContent = 'Connected';
-        document.getElementById('connect-btn').disabled = true;
-
-        show('twitter-section');
-        show('placement-section');
-        initBoard();
-      } catch (err) {
-        showError(err.message);
-      }
-    });
-
-    function initBoard() {
-      const instructions = game.shipSize === 1
-        ? 'Click a cell to place your tiny dinghy'
-        : `Click ${game.shipSize} adjacent cells to place your ship`;
-      document.getElementById('placement-instructions').textContent = instructions;
-
-      board = new GameBoard('board', {
-        shipSize: game.shipSize,
-        interactive: true,
-        onSelect: (cells) => {
-          selectedCells = cells;
-          const labels = cells.map(c => {
-            const row = Math.floor(c / 5);
-            const col = c % 5;
-            return `${String.fromCharCode(65 + row)}${col + 1}`;
-          });
-          document.getElementById('placement-preview').textContent = `Selected: ${labels.join(', ')}`;
-          document.getElementById('pay-btn').disabled = false;
-          show('pay-section');
-        },
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Link copied!');
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Link copied!');
       });
     }
 
-    document.getElementById('pay-btn').addEventListener('click', async () => {
+    async function verifyTwitterHandle() {
+      const handleInput = document.getElementById('twitter-handle');
+      const verifyBtn = document.getElementById('verify-btn');
+      const handle = handleInput.value.trim().replace('@', '');
+
+      if (!handle) {
+        showToast('Please enter your Twitter handle');
+        return;
+      }
+
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
+
       try {
-        document.getElementById('pay-btn').disabled = true;
-        document.getElementById('pay-btn').textContent = 'Processing...';
-
-        const wallet = getWallet();
-        const timestamp = Date.now();
-        const message = `Battle Dinghy: join game ${gameId} at ${timestamp}`;
-        const signature = await wallet.signMessage(message);
-        const twitterHandle = document.getElementById('twitter-input').value;
-
-        // For demo, using signature as entryTx (real implementation would create actual transaction)
-        await api.joinGame(gameId, {
-          walletAddress: wallet.publicKey,
-          signature,
-          message,
-          timestamp,
-          cells: selectedCells,
-          twitterHandle: twitterHandle || null,
-          entryTx: signature, // Placeholder
+        const res = await fetch(`${API_BASE}/api/actions/${gameId}/verify-twitter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ twitterHandle: handle })
         });
 
-        hide('wallet-section');
-        hide('twitter-section');
-        hide('placement-section');
-        hide('pay-section');
-        document.getElementById('game-link').href = `/game/${gameId}`;
-        show('success-section');
-      } catch (err) {
-        showError(err.message);
-        document.getElementById('pay-btn').disabled = false;
-        document.getElementById('pay-btn').textContent = 'Pay & Join';
-      }
-    });
+        const data = await res.json();
 
-    function show(id) { document.getElementById(id).classList.remove('hidden'); }
-    function hide(id) { document.getElementById(id).classList.add('hidden'); }
-    function showError(msg) {
-      document.getElementById('error-message').textContent = msg;
-      show('error-section');
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to verify handle');
+        }
+
+        verificationToken = data.token;
+        verifiedHandle = data.twitterHandle;
+
+        // Show wallet buttons
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step1').classList.add('complete');
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('twitter-section').classList.add('hidden');
+        document.getElementById('wallet-section').classList.remove('hidden');
+        document.getElementById('verified-handle').textContent = `@${verifiedHandle}`;
+
+        updateWalletLinks();
+        showToast('Handle verified!');
+
+      } catch (err) {
+        showToast(err.message);
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify & Continue';
+      }
     }
 
-    init();
+    function updateWalletLinks() {
+      const actionUrl = `${API_BASE}/api/actions/game/${gameId}?token=${verificationToken}`;
+      const phantomUrl = `https://phantom.app/ul/browse/${encodeURIComponent(actionUrl)}`;
+      const solflareUrl = `https://solflare.com/ul/v1/browse/${encodeURIComponent(actionUrl)}`;
+
+      document.getElementById('phantom-link').href = phantomUrl;
+      document.getElementById('solflare-link').href = solflareUrl;
+      document.getElementById('copy-link-btn').onclick = () => copyToClipboard(actionUrl);
+    }
+
+    async function loadGameInfo() {
+      const content = document.getElementById('content');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/games/${gameId}`);
+
+        if (!res.ok) {
+          content.innerHTML = `
+            <div class="error-message">
+              <span class="status-badge error">Game Not Found</span>
+              <h2>This game doesn't exist</h2>
+              <p class="info-text">The game may have ended or the link is invalid.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const game = await res.json();
+
+        // Get values with fallbacks for different API response formats
+        const currentPlayers = game.playerCount || game.currentPlayers || 0;
+        const maxPlayers = game.maxPlayers || 10;
+        const spotsLeft = maxPlayers - currentPlayers;
+        const entryFeeSol = game.entryFeeSol || (game.entryFeeLamports / 1000000000) || 0.001;
+
+        // Determine status
+        let statusClass = 'waiting';
+        let statusText = 'Open for Players';
+        let canJoin = true;
+
+        if (game.status === 'active' || game.status === 'repositioning') {
+          statusClass = 'active';
+          statusText = 'In Progress';
+          canJoin = false;
+        } else if (game.status === 'complete' || game.status === 'completed' || game.status === 'cancelled') {
+          statusClass = 'completed';
+          statusText = game.status === 'cancelled' ? 'Cancelled' : 'Completed';
+          canJoin = false;
+        } else if (spotsLeft <= 0) {
+          statusClass = 'active';
+          statusText = 'Full';
+          canJoin = false;
+        }
+
+        let joinHtml = '';
+        if (canJoin) {
+          joinHtml = `
+            <div class="step-indicator">
+              <div id="step1" class="step active">1</div>
+              <div id="step2" class="step">2</div>
+            </div>
+
+            <div id="twitter-section" class="twitter-section">
+              <h3>Step 1: Enter your Twitter handle</h3>
+              <p class="info-text" style="margin-bottom: 12px;">Required for game notifications and payouts</p>
+              <input type="text" id="twitter-handle" class="twitter-input" placeholder="@your_handle">
+              <button id="verify-btn" class="wallet-btn verify" onclick="verifyTwitterHandle()">
+                Verify & Continue
+              </button>
+            </div>
+
+            <div id="wallet-section" class="wallet-buttons hidden">
+              <div class="success-message">
+                Verified as <span id="verified-handle"></span>
+              </div>
+              <h3 style="margin-bottom: 16px; color: #c0c8d0;">Step 2: Pay with your wallet</h3>
+              <a id="phantom-link" href="#" class="wallet-btn phantom" target="_blank" rel="noopener">
+                <svg width="24" height="24" viewBox="0 0 128 128" fill="none">
+                  <circle cx="64" cy="64" r="64" fill="url(#phantom-grad)"/>
+                  <path d="M110.5 65.7C110.5 89.2 91.5 108.2 68.1 108.2H37C35.6 108.2 34.6 107.1 34.6 105.8V67.6C34.6 66.2 35.6 65.1 37 65.1H68.6C70 65.1 71.1 64 71.1 62.7V62.1C71.1 60.7 70 59.6 68.6 59.6H37C35.6 59.6 34.6 58.5 34.6 57.2V22.2C34.6 20.9 35.6 19.8 37 19.8H68.1C91.5 19.8 110.5 38.8 110.5 62.3V65.7Z" fill="white"/>
+                  <defs><linearGradient id="phantom-grad" x1="64" y1="0" x2="64" y2="128"><stop stop-color="#534BB1"/><stop offset="1" stop-color="#551BF9"/></linearGradient></defs>
+                </svg>
+                Open in Phantom
+              </a>
+              <a id="solflare-link" href="#" class="wallet-btn solflare" target="_blank" rel="noopener">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="16" fill="#FC6C04"/>
+                  <path d="M16 6L22 12L16 18L10 12L16 6Z" fill="white"/>
+                  <path d="M16 14L22 20L16 26L10 20L16 14Z" fill="white" fill-opacity="0.6"/>
+                </svg>
+                Open in Solflare
+              </a>
+              <button id="copy-link-btn" class="wallet-btn copy-link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy Blinks URL
+              </button>
+            </div>
+
+            <div class="divider"><span>Need a wallet?</span></div>
+
+            <p class="info-text">
+              <a href="https://phantom.app/download" target="_blank">Download Phantom</a> or
+              <a href="https://solflare.com/download" target="_blank">Solflare</a>
+            </p>
+
+            <div class="instructions">
+              <strong>How to join:</strong>
+              <ol>
+                <li>Enter your Twitter handle and click verify</li>
+                <li>Click "Open in Phantom" or "Open in Solflare"</li>
+                <li>Approve the payment transaction (${entryFeeSol} SOL)</li>
+                <li>You're in! You'll be notified when the game starts</li>
+              </ol>
+            </div>
+          `;
+        } else {
+          joinHtml = `
+            <p class="info-text">This game is no longer accepting players.</p>
+          `;
+        }
+
+        content.innerHTML = `
+          <div style="text-align: center;">
+            <span class="status-badge ${statusClass}">${statusText}</span>
+          </div>
+
+          <div class="game-info">
+            <div class="game-id">${gameId}</div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Entry Fee</div>
+                <div class="stat-value sol">${entryFeeSol} SOL</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Players</div>
+                <div class="stat-value">${currentPlayers}/${maxPlayers}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Spots Left</div>
+                <div class="stat-value">${spotsLeft}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="join-section">
+            ${joinHtml}
+          </div>
+        `;
+
+      } catch (err) {
+        console.error('Error loading game:', err);
+        content.innerHTML = `
+          <div class="error-message">
+            <span class="status-badge error">Error</span>
+            <h2>Failed to load game</h2>
+            <p class="info-text">Please try refreshing the page.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Load game info on page load
+    loadGameInfo();
   </script>
 </body>
 </html>
