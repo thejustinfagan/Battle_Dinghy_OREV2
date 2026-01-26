@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Battle Dinghy</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">Battle Dinghy</h1>
+
+    <div id="game-info" class="card">
+      <div class="loading">Loading game...</div>
+    </div>
+
+    <div id="wallet-section" class="card hidden">
+      <h2>Step 1: Connect Wallet</h2>
+      <button id="connect-btn" class="btn primary">Connect Wallet</button>
+      <p id="wallet-address" class="text-secondary mt-4 hidden"></p>
+    </div>
+
+    <div id="twitter-section" class="card hidden">
+      <h2>Step 2: Twitter Handle (optional)</h2>
+      <input type="text" id="twitter-input" placeholder="@username">
+      <p class="text-secondary">For game notifications</p>
+    </div>
+
+    <div id="placement-section" class="card hidden">
+      <h2>Step 3: Place Your Ship</h2>
+      <p id="placement-instructions" class="text-secondary mb-4"></p>
+      <div id="board"></div>
+      <p id="placement-preview" class="text-center mt-4"></p>
+    </div>
+
+    <div id="pay-section" class="card hidden">
+      <h2>Step 4: Pay Entry Fee</h2>
+      <p>Entry: <strong id="entry-fee"></strong> SOL</p>
+      <p class="text-secondary mb-4">You'll be prompted to sign a transaction</p>
+      <button id="pay-btn" class="btn primary large" disabled>Pay & Join</button>
+    </div>
+
+    <div id="success-section" class="card success hidden">
+      <h2>You're In!</h2>
+      <p>Waiting for game to start...</p>
+      <p class="text-secondary">You'll be notified when it begins.</p>
+      <a id="game-link" href="#" class="btn secondary mt-4">View Game</a>
+    </div>
+
+    <div id="error-section" class="card error hidden">
+      <p id="error-message"></p>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/wallet-adapter.js"></script>
+  <script src="/js/game-board.js"></script>
+  <script>
+    const gameId = window.location.pathname.split('/').pop();
+    let game = null;
+    let board = null;
+    let selectedCells = [];
+
+    async function init() {
+      try {
+        game = await api.getGame(gameId);
+        showGameInfo();
+        show('wallet-section');
+      } catch (err) {
+        showError('Game not found');
+      }
+    }
+
+    function showGameInfo() {
+      document.getElementById('game-info').innerHTML = `
+        <h2>Game: ${game.id}</h2>
+        <p>Entry: ${game.entryFeeSol} SOL - Players: ${game.playerCount}/${game.maxPlayers}</p>
+        <p>Ship: ${['Tiny Dinghy (1 cell)', 'Mid Ship (2 cells)', 'Giant Vessel (3 cells)'][game.shipSize - 1]}</p>
+        <p>Shots: ${game.shotsPerSalvo} per round - Reposition: ${game.repositionWindowMinutes} min</p>
+      `;
+      document.getElementById('entry-fee').textContent = game.entryFeeSol;
+    }
+
+    document.getElementById('connect-btn').addEventListener('click', async () => {
+      try {
+        const wallet = await connectWallet();
+        document.getElementById('wallet-address').textContent = `Connected: ${wallet.publicKey.slice(0, 8)}...`;
+        document.getElementById('wallet-address').classList.remove('hidden');
+        document.getElementById('connect-btn').textContent = 'Connected';
+        document.getElementById('connect-btn').disabled = true;
+
+        show('twitter-section');
+        show('placement-section');
+        initBoard();
+      } catch (err) {
+        showError(err.message);
+      }
+    });
+
+    function initBoard() {
+      const instructions = game.shipSize === 1
+        ? 'Click a cell to place your tiny dinghy'
+        : `Click ${game.shipSize} adjacent cells to place your ship`;
+      document.getElementById('placement-instructions').textContent = instructions;
+
+      board = new GameBoard('board', {
+        shipSize: game.shipSize,
+        interactive: true,
+        onSelect: (cells) => {
+          selectedCells = cells;
+          const labels = cells.map(c => {
+            const row = Math.floor(c / 5);
+            const col = c % 5;
+            return `${String.fromCharCode(65 + row)}${col + 1}`;
+          });
+          document.getElementById('placement-preview').textContent = `Selected: ${labels.join(', ')}`;
+          document.getElementById('pay-btn').disabled = false;
+          show('pay-section');
+        },
+      });
+    }
+
+    document.getElementById('pay-btn').addEventListener('click', async () => {
+      try {
+        document.getElementById('pay-btn').disabled = true;
+        document.getElementById('pay-btn').textContent = 'Processing...';
+
+        const wallet = getWallet();
+        const timestamp = Date.now();
+        const message = `Battle Dinghy: join game ${gameId} at ${timestamp}`;
+        const signature = await wallet.signMessage(message);
+        const twitterHandle = document.getElementById('twitter-input').value;
+
+        // For demo, using signature as entryTx (real implementation would create actual transaction)
+        await api.joinGame(gameId, {
+          walletAddress: wallet.publicKey,
+          signature,
+          message,
+          timestamp,
+          cells: selectedCells,
+          twitterHandle: twitterHandle || null,
+          entryTx: signature, // Placeholder
+        });
+
+        hide('wallet-section');
+        hide('twitter-section');
+        hide('placement-section');
+        hide('pay-section');
+        document.getElementById('game-link').href = `/game/${gameId}`;
+        show('success-section');
+      } catch (err) {
+        showError(err.message);
+        document.getElementById('pay-btn').disabled = false;
+        document.getElementById('pay-btn').textContent = 'Pay & Join';
+      }
+    });
+
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id).classList.add('hidden'); }
+    function showError(msg) {
+      document.getElementById('error-message').textContent = msg;
+      show('error-section');
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Dinghy Game</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">Battle Dinghy</h1>
+
+    <div id="game-status" class="card">
+      <div class="loading">Loading game...</div>
+    </div>
+
+    <div id="board-section" class="card hidden">
+      <h2 id="board-title">Game Board</h2>
+      <div id="board"></div>
+      <div id="legend" class="text-secondary text-center mt-4">
+        <span style="color: var(--accent);">&#9632;</span> Your ship
+        <span style="color: var(--danger); margin-left: 12px;">&#9632;</span> Shot
+        <span style="color: #aa4a4a; margin-left: 12px;">&#9632;</span> Hit
+      </div>
+    </div>
+
+    <div id="reposition-section" class="card hidden">
+      <h2>Reposition Your Ship</h2>
+      <p class="text-secondary mb-4">Time remaining: <span id="time-remaining">--:--</span></p>
+      <div id="reposition-board"></div>
+      <button id="reposition-btn" class="btn primary mt-4" disabled>Confirm New Position</button>
+      <p id="reposition-status" class="text-secondary mt-4"></p>
+    </div>
+
+    <div id="results-section" class="card hidden">
+      <h2>Game Complete</h2>
+      <div id="results-content"></div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/wallet-adapter.js"></script>
+  <script src="/js/game-board.js"></script>
+  <script>
+    const gameId = window.location.pathname.split('/').pop();
+    let wallet = null;
+    let board = null;
+    let repositionBoard = null;
+    let gameData = null;
+    let newPosition = [];
+
+    async function init() {
+      try {
+        wallet = await connectWallet().catch(() => null);
+      } catch {}
+      await loadGame();
+      setInterval(loadGame, 10000);
+    }
+
+    async function loadGame() {
+      try {
+        const walletAddr = wallet?.publicKey;
+        gameData = await api.getGameStatus(gameId, walletAddr);
+        renderGame();
+      } catch (err) {
+        document.getElementById('game-status').innerHTML = `<p>Error: ${err.message}</p>`;
+      }
+    }
+
+    function renderGame() {
+      const g = gameData;
+
+      // Status card
+      const statusMap = {
+        waiting: 'Waiting for players',
+        active: 'Round in progress',
+        repositioning: 'Repositioning phase',
+        complete: 'Game complete',
+        cancelled: 'Game cancelled',
+      };
+
+      document.getElementById('game-status').innerHTML = `
+        <h2>${g.gameId}</h2>
+        <p><strong>Status:</strong> ${statusMap[g.status]}</p>
+        <p><strong>Round:</strong> ${g.round} - <strong>Players:</strong> ${g.playerCount}/${g.maxPlayers}</p>
+        ${g.deadline ? `<p><strong>Deadline:</strong> ${new Date(g.deadline).toLocaleTimeString()}</p>` : ''}
+        ${g.myStatus ? `<p><strong>Your status:</strong> ${g.myStatus.isEliminated ? 'Eliminated' : 'Alive'}</p>` : ''}
+      `;
+
+      // Show board if game has started
+      if (g.status !== 'waiting') {
+        show('board-section');
+        renderBoard();
+      }
+
+      // Repositioning
+      if (g.status === 'repositioning' && g.myStatus && !g.myStatus.isEliminated) {
+        show('reposition-section');
+        initRepositionBoard();
+        updateTimer(g.deadline);
+      } else {
+        hide('reposition-section');
+      }
+
+      // Results
+      if (g.status === 'complete') {
+        show('results-section');
+        const isWinner = g.winners?.includes(wallet?.publicKey);
+        document.getElementById('results-content').innerHTML = `
+          <p>${g.winners?.length === 1 ? 'Winner' : 'Winners'}: ${g.winners?.length || 0}</p>
+          ${isWinner ? '<p style="color: var(--success); font-size: 1.5rem;">You won!</p>' : ''}
+        `;
+      }
+    }
+
+    function renderBoard() {
+      if (!board) {
+        board = new GameBoard('board', { interactive: false });
+      }
+      board.reset();
+
+      // Show last round shots
+      if (gameData.lastRound) {
+        board.showShots(gameData.lastRound.shots);
+      }
+
+      // Show my ship
+      if (gameData.myStatus) {
+        board.showShip(gameData.myStatus.position, 'ship');
+        board.showHits(gameData.myStatus.hits);
+      }
+
+      // Show all positions if revealed
+      if (gameData.allPositions) {
+        gameData.allPositions.forEach(p => {
+          if (p.isEliminated) {
+            board.markEliminated(p.position);
+          }
+        });
+      }
+    }
+
+    function initRepositionBoard() {
+      if (!repositionBoard) {
+        repositionBoard = new GameBoard('reposition-board', {
+          shipSize: gameData.config.shipSize,
+          interactive: true,
+          onSelect: (cells) => {
+            newPosition = cells;
+            document.getElementById('reposition-btn').disabled = false;
+            document.getElementById('reposition-status').textContent =
+              `New position: ${cells.map(c => `${String.fromCharCode(65 + Math.floor(c/5))}${(c%5)+1}`).join(', ')}`;
+          },
+        });
+      }
+    }
+
+    document.getElementById('reposition-btn')?.addEventListener('click', async () => {
+      try {
+        document.getElementById('reposition-btn').disabled = true;
+        const timestamp = Date.now();
+        const message = `Battle Dinghy: reposition in ${gameId} at ${timestamp}`;
+        const signature = await wallet.signMessage(message);
+
+        await api.reposition(gameId, {
+          walletAddress: wallet.publicKey,
+          signature,
+          message,
+          timestamp,
+          cells: newPosition,
+        });
+
+        document.getElementById('reposition-status').textContent = 'Position updated!';
+        await loadGame();
+      } catch (err) {
+        document.getElementById('reposition-status').textContent = `Error: ${err.message}`;
+        document.getElementById('reposition-btn').disabled = false;
+      }
+    });
+
+    function updateTimer(deadline) {
+      const update = () => {
+        const remaining = new Date(deadline) - new Date();
+        if (remaining <= 0) {
+          document.getElementById('time-remaining').textContent = 'Expired';
+          return;
+        }
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        document.getElementById('time-remaining').textContent =
+          `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
+    function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+    init();
+  </script>
+</body>
+</html>

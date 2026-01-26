@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Dinghy Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Battle Dinghy Admin</h1>
+
+    <div id="auth-section">
+      <div class="card">
+        <h2>Admin Login</h2>
+        <input type="password" id="api-key-input" placeholder="Enter Admin API Key">
+        <button id="login-btn" class="btn primary">Login</button>
+      </div>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="status-row" id="status-row">
+        <div class="status-card">
+          <span class="status-indicator" id="server-status"></span>
+          <span>Server</span>
+        </div>
+        <div class="status-card">
+          <span class="status-indicator" id="db-status"></span>
+          <span>Database</span>
+        </div>
+        <div class="status-card">
+          <span class="status-indicator" id="twitter-status"></span>
+          <span>Twitter</span>
+        </div>
+        <div class="status-card">
+          <span id="escrow-balance">--</span>
+          <span>SOL</span>
+        </div>
+      </div>
+
+      <button id="create-btn" class="btn primary large mb-4">Create New Game</button>
+      <button id="logout-btn" class="btn secondary mb-4" style="margin-left: 12px;">Logout</button>
+
+      <div class="card">
+        <h2>Games</h2>
+        <div id="games-table">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="create-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Create New Game</h2>
+        <form id="create-form">
+          <label>Entry Fee (SOL)</label>
+          <input type="number" name="entryFeeSol" value="0.1" min="0.0001" max="10" step="0.0001">
+
+          <label>Max Players</label>
+          <input type="number" name="maxPlayers" value="8" min="2" max="100">
+
+          <label>Ship Size</label>
+          <select name="shipSize">
+            <option value="1">Tiny (1 cell)</option>
+            <option value="2">Mid (2 cells)</option>
+            <option value="3">Giant (3 cells)</option>
+          </select>
+
+          <label>Shots Per Salvo</label>
+          <input type="number" name="shotsPerSalvo" value="5" min="3" max="15">
+
+          <label>Fill Deadline (minutes)</label>
+          <input type="number" name="fillDeadlineMinutes" value="60" min="5" max="1440">
+
+          <label>Reposition Window (minutes)</label>
+          <input type="number" name="repositionWindowMinutes" value="30" min="5" max="120">
+
+          <label>Custom Tweet (optional)</label>
+          <textarea name="customTweetText" maxlength="200" rows="2"></textarea>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Create Game</button>
+            <button type="button" id="cancel-create" class="btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let apiKey = localStorage.getItem('adminApiKey') || '';
+
+    if (apiKey) {
+      showDashboard();
+    }
+
+    document.getElementById('login-btn').addEventListener('click', () => {
+      apiKey = document.getElementById('api-key-input').value;
+      if (apiKey) {
+        localStorage.setItem('adminApiKey', apiKey);
+        showDashboard();
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('adminApiKey');
+      apiKey = '';
+      document.getElementById('auth-section').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    });
+
+    document.getElementById('create-btn').addEventListener('click', () => {
+      document.getElementById('create-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-create').addEventListener('click', () => {
+      document.getElementById('create-modal').classList.add('hidden');
+    });
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        entryFeeSol: parseFloat(form.entryFeeSol.value),
+        maxPlayers: parseInt(form.maxPlayers.value),
+        shipSize: parseInt(form.shipSize.value),
+        shotsPerSalvo: parseInt(form.shotsPerSalvo.value),
+        fillDeadlineMinutes: parseInt(form.fillDeadlineMinutes.value),
+        repositionWindowMinutes: parseInt(form.repositionWindowMinutes.value),
+        customTweetText: form.customTweetText.value || undefined,
+      };
+
+      try {
+        await api.admin.createGame(apiKey, data);
+        document.getElementById('create-modal').classList.add('hidden');
+        form.reset();
+        loadGames();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    async function showDashboard() {
+      document.getElementById('auth-section').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      await loadStatus();
+      await loadGames();
+      setInterval(loadStatus, 30000);
+      setInterval(loadGames, 30000);
+    }
+
+    async function loadStatus() {
+      try {
+        const status = await api.admin.getStatus(apiKey);
+        setIndicator('server-status', status.server?.status === 'ok');
+        setIndicator('db-status', status.database?.status === 'ok');
+        setIndicator('twitter-status', status.twitter?.status === 'ok');
+        document.getElementById('escrow-balance').textContent =
+          status.escrow?.balanceSol?.toFixed(4) || '--';
+      } catch (err) {
+        console.error('Status error:', err);
+      }
+    }
+
+    async function loadGames() {
+      try {
+        const { games } = await api.admin.getGames(apiKey);
+        const container = document.getElementById('games-table');
+
+        if (games.length === 0) {
+          container.innerHTML = '<p class="text-secondary">No games yet</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Players</th>
+                <th>Pool</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${games.map(g => `
+                <tr>
+                  <td>${g.id}</td>
+                  <td>${g.status}</td>
+                  <td>${g.playerCount}/${g.maxPlayers}</td>
+                  <td>${g.prizePoolSol.toFixed(4)} SOL</td>
+                  <td>
+                    ${g.status === 'waiting' ? `
+                      <button class="btn secondary" onclick="cancelGame('${g.id}')">Cancel</button>
+                      ${g.playerCount >= 2 ? `<button class="btn primary" onclick="forceStart('${g.id}')">Start</button>` : ''}
+                    ` : ''}
+                    <a href="/game/${g.id}" class="btn secondary">View</a>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error('Games error:', err);
+      }
+    }
+
+    async function cancelGame(gameId) {
+      if (!confirm('Cancel this game? Players will be refunded.')) return;
+      try {
+        await api.admin.cancelGame(apiKey, gameId);
+        loadGames();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function forceStart(gameId) {
+      if (!confirm('Force start this game now?')) return;
+      try {
+        await api.admin.forceStart(apiKey, gameId);
+        loadGames();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function setIndicator(id, ok) {
+      const el = document.getElementById(id);
+      el.classList.remove('ok', 'error');
+      el.classList.add(ok ? 'ok' : 'error');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Dinghy ORE</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="text-center" style="padding: 60px 0;">
+      <h1>Battle Dinghy ORE</h1>
+      <p class="text-secondary mb-4">Skill-based multiplayer survival on the Solana blockchain</p>
+
+      <div class="card">
+        <h2>Active Games</h2>
+        <div id="games-list">
+          <div class="loading">Loading games...</div>
+        </div>
+      </div>
+
+      <p class="text-secondary mt-4">
+        <a href="/admin" class="btn secondary">Admin Dashboard</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    async function loadGames() {
+      try {
+        const { games } = await api.getGames();
+        const container = document.getElementById('games-list');
+
+        if (games.length === 0) {
+          container.innerHTML = '<p class="text-secondary">No active games. Check back soon!</p>';
+          return;
+        }
+
+        container.innerHTML = games.map(g => `
+          <div class="card" style="text-align: left;">
+            <h3>${g.id}</h3>
+            <p>Entry: ${g.entryFeeSol} SOL - Players: ${g.playerCount}/${g.maxPlayers}</p>
+            <p class="text-secondary">Ship: ${['Tiny', 'Mid', 'Giant'][g.shipSize - 1]} - Shots: ${g.shotsPerSalvo}/round</p>
+            <a href="/join/${g.id}" class="btn primary">Join Game</a>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('games-list').innerHTML = `<p class="text-secondary">Error: ${err.message}</p>`;
+      }
+    }
+
+    loadGames();
+    setInterval(loadGames, 30000);
+  </script>
+</body>
+</html>

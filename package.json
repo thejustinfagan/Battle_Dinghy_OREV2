@@ -1,0 +1,41 @@
+{
+  "name": "battle-dinghy-ore",
+  "version": "1.0.0",
+  "description": "Skill-based multiplayer naval battle game on Solana with ORE mining",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.87.0",
+    "bs58": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "sql.js": "^1.8.0",
+    "tweetnacl": "^1.0.3",
+    "twitter-api-v2": "^1.15.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/sql.js": "^1.4.4",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "solana",
+    "game",
+    "battleship",
+    "ore",
+    "blockchain"
+  ],
+  "author": "",
+  "license": "MIT"
+}
