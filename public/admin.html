@@ -600,17 +600,40 @@
       return res.json();
     }
 
-    // Initialize
+    // Initialize - validate stored key before showing dashboard
     if (apiKey) {
-      showDashboard();
+      validateAndShowDashboard(apiKey);
+    }
+
+    // Validate API key by making a test call
+    async function validateAndShowDashboard(key) {
+      try {
+        apiKey = key;
+        await apiCall('/api/admin/status');
+        localStorage.setItem('adminApiKey', apiKey);
+        showDashboard();
+      } catch (err) {
+        // Key is invalid, clear it and show login
+        localStorage.removeItem('adminApiKey');
+        apiKey = '';
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+        if (key) {
+          showToast('Invalid or expired API key');
+        }
+      }
     }
 
     // Login
-    document.getElementById('login-btn').addEventListener('click', () => {
-      apiKey = document.getElementById('api-key-input').value;
-      if (apiKey) {
-        localStorage.setItem('adminApiKey', apiKey);
-        showDashboard();
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const inputKey = document.getElementById('api-key-input').value;
+      if (inputKey) {
+        const btn = document.getElementById('login-btn');
+        btn.disabled = true;
+        btn.textContent = 'Verifying...';
+        await validateAndShowDashboard(inputKey);
+        btn.disabled = false;
+        btn.textContent = 'Login';
       }
     });
 
