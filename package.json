@@ -1,6 +1,6 @@
 {
-  "name": "battle-dinghy-ore",
-  "version": "1.0.0",
+  "name": "battle-dinghy-ore-v2",
+  "version": "2.0.0",
   "description": "Skill-based multiplayer naval battle game on Solana with ORE mining",
   "type": "module",
   "main": "dist/index.js",
