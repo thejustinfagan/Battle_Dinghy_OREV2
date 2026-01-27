@@ -41,6 +41,10 @@ async function main() {
     res.sendFile(join(__dirname, '../public/game.html'));
   });
 
+  app.get('/reposition/:gameId', (req, res) => {
+    res.sendFile(join(__dirname, '../public/reposition.html'));
+  });
+
   app.get('/admin', (req, res) => {
     res.sendFile(join(__dirname, '../public/admin.html'));
   });

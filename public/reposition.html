@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reposition Ship - Battle Dinghy ORE</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #4fc3f7;
+    }
+
+    .game-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .game-info p {
+      margin: 5px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .status-active {
+      background: #4caf50;
+    }
+
+    .status-waiting {
+      background: #ff9800;
+    }
+
+    .status-repositioning {
+      background: #2196f3;
+    }
+
+    .status-error {
+      background: #f44336;
+    }
+
+    .grid-container {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-width: 300px;
+      margin: 20px auto;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      background: #1e3a5f;
+      border: 2px solid #2c5f8d;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .cell:hover:not(.hit) {
+      background: #2c5f8d;
+      transform: scale(1.05);
+    }
+
+    .cell.ship {
+      background: #4fc3f7;
+      border-color: #29b6f6;
+    }
+
+    .cell.ship-new {
+      background: #66bb6a;
+      border-color: #4caf50;
+      animation: pulse 1s infinite;
+    }
+
+    .cell.hit {
+      background: #e53935;
+      border-color: #c62828;
+      cursor: not-allowed;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 15px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Courier New', monospace;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+      color: #000;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 195, 247, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .message.error {
+      background: rgba(244, 67, 54, 0.2);
+      border: 2px solid #f44336;
+    }
+
+    .message.success {
+      background: rgba(76, 175, 80, 0.2);
+      border: 2px solid #4caf50;
+    }
+
+    .message.info {
+      background: rgba(33, 150, 243, 0.2);
+      border: 2px solid #2196f3;
+    }
+
+    .wallet-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .wallet-address {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-left-color: #4fc3f7;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .skill-tip {
+      background: rgba(255, 193, 7, 0.15);
+      border: 1px solid rgba(255, 193, 7, 0.5);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .skill-tip p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Reposition Your Ship</h1>
+      <p>Click cells to place your ship in a new position</p>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Loading game data...</p>
+    </div>
+
+    <div id="app" style="display: none;">
+      <div class="game-info">
+        <p><strong>Game ID:</strong> <span id="gameId"></span></p>
+        <p><strong>Status:</strong> <span id="gameStatus"></span></p>
+        <p><strong>Round:</strong> <span id="round"></span></p>
+        <p><strong>Deadline:</strong> <span id="deadline"></span></p>
+      </div>
+
+      <div id="messageContainer"></div>
+
+      <div class="wallet-section">
+        <button id="connectWallet" class="btn-primary">Connect Wallet</button>
+        <div id="walletInfo" style="display: none;">
+          <p>Connected:</p>
+          <div class="wallet-address" id="walletAddress"></div>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <h3 style="text-align: center; margin-bottom: 15px;">Ship Position</h3>
+        <div id="grid" class="grid"></div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #4fc3f7;"></div>
+            <span>Current Position</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #66bb6a;"></div>
+            <span>New Position</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e53935;"></div>
+            <span>Hit</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="clearBtn" class="btn-secondary">Clear Selection</button>
+        <button id="submitBtn" class="btn-primary" disabled>Submit New Position</button>
+      </div>
+
+      <div class="skill-tip">
+        <p>This is a skill-based game - choose your new position wisely!</p>
+        <p>You can only move if you have unhit cells remaining.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Parse game ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get('gameId') || window.location.pathname.split('/').filter(Boolean).pop();
+
+    let walletConnected = false;
+    let walletAddress = null;
+    let gameData = null;
+    let selectedCells = [];
+    let shipSize = 0;
+
+    // Show message to user
+    function showMessage(text, type = 'info') {
+      const container = document.getElementById('messageContainer');
+      container.innerHTML = `<div class="message ${type}">${text}</div>`;
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 5000);
+    }
+
+    // Connect to Phantom wallet
+    async function connectWallet() {
+      try {
+        if (!window.solana || !window.solana.isPhantom) {
+          showMessage('Phantom wallet not found. Please install Phantom.', 'error');
+          window.open('https://phantom.app/', '_blank');
+          return;
+        }
+
+        const resp = await window.solana.connect();
+        walletAddress = resp.publicKey.toString();
+        walletConnected = true;
+
+        document.getElementById('connectWallet').style.display = 'none';
+        document.getElementById('walletInfo').style.display = 'block';
+        document.getElementById('walletAddress').textContent = walletAddress;
+
+        showMessage('Wallet connected successfully!', 'success');
+        await loadGameData();
+      } catch (err) {
+        console.error('Wallet connection error:', err);
+        showMessage('Failed to connect wallet: ' + err.message, 'error');
+      }
+    }
+
+    // Load game data from API
+    async function loadGameData() {
+      try {
+        const response = await fetch(`/api/player/${gameId}/reposition-status?wallet=${walletAddress}`);
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to load game data');
+        }
+
+        gameData = await response.json();
+
+        // Update UI with game info
+        document.getElementById('gameId').textContent = gameId;
+        document.getElementById('gameStatus').innerHTML = `<span class="status-badge status-${gameData.gameStatus}">${gameData.gameStatus}</span>`;
+        document.getElementById('round').textContent = gameData.round;
+        document.getElementById('deadline').textContent = gameData.deadline
+          ? new Date(gameData.deadline).toLocaleString()
+          : 'None';
+
+        // Check if player can reposition
+        if (!gameData.canReposition) {
+          showMessage(gameData.reason || 'Cannot reposition at this time', 'error');
+          document.getElementById('submitBtn').disabled = true;
+          renderGrid();
+          return;
+        }
+
+        if (gameData.gameStatus !== 'repositioning') {
+          showMessage('Game is not in repositioning phase', 'error');
+          renderGrid();
+          return;
+        }
+
+        shipSize = gameData.currentPosition.length;
+        renderGrid();
+        showMessage(`You have ${gameData.stats.unhitCells} unhit cells. Place your ship in a new position!`, 'info');
+
+      } catch (err) {
+        console.error('Load game error:', err);
+        showMessage('Failed to load game: ' + err.message, 'error');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+      }
+    }
+
+    // Render the 5x5 grid
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = i;
+
+        // Mark current position
+        if (gameData && gameData.currentPosition.includes(i)) {
+          cell.classList.add('ship');
+        }
+
+        // Mark hits
+        if (gameData && gameData.hits.includes(i)) {
+          cell.classList.add('hit');
+          cell.textContent = 'X';
+        }
+
+        // Mark selected cells for new position
+        if (selectedCells.includes(i)) {
+          cell.classList.add('ship-new');
+        }
+
+        cell.addEventListener('click', () => handleCellClick(i));
+        grid.appendChild(cell);
+      }
+    }
+
+    // Handle cell click for selection
+    function handleCellClick(index) {
+      if (!gameData || !gameData.canReposition) {
+        showMessage('Cannot reposition at this time', 'error');
+        return;
+      }
+
+      if (gameData.hits.includes(index)) {
+        showMessage('Cannot place ship on a hit cell', 'error');
+        return;
+      }
+
+      // If already selected, deselect
+      if (selectedCells.includes(index)) {
+        selectedCells = selectedCells.filter(c => c !== index);
+      } else {
+        // Add to selection if not at ship size limit
+        if (selectedCells.length < shipSize) {
+          selectedCells.push(index);
+        } else {
+          showMessage(`Ship size is ${shipSize} cells. Clear selection to start over.`, 'error');
+          return;
+        }
+      }
+
+      renderGrid();
+      document.getElementById('submitBtn').disabled = selectedCells.length !== shipSize;
+    }
+
+    // Clear selection
+    function clearSelection() {
+      selectedCells = [];
+      renderGrid();
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+    // Submit new position
+    async function submitPosition() {
+      if (selectedCells.length !== shipSize) {
+        showMessage(`Please select exactly ${shipSize} cells`, 'error');
+        return;
+      }
+
+      if (!walletConnected || !walletAddress) {
+        showMessage('Please connect your wallet first', 'error');
+        return;
+      }
+
+      try {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').textContent = 'Submitting...';
+
+        // Create message to sign
+        const message = `Reposition ship in game ${gameId} at ${Date.now()}`;
+        const encodedMessage = new TextEncoder().encode(message);
+        const signature = await window.solana.signMessage(encodedMessage, 'utf8');
+
+        // Submit to API
+        const response = await fetch(`/api/player/${gameId}/reposition`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            walletAddress,
+            signature: btoa(String.fromCharCode(...signature.signature)),
+            message,
+            timestamp: Date.now(),
+            cells: selectedCells
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to submit position');
+        }
+
+        const result = await response.json();
+        showMessage('Ship repositioned successfully!', 'success');
+
+        // Update display with new position
+        gameData.currentPosition = result.newPosition;
+        selectedCells = [];
+        renderGrid();
+
+      } catch (err) {
+        console.error('Submit error:', err);
+        showMessage('Failed to reposition: ' + err.message, 'error');
+      } finally {
+        document.getElementById('submitBtn').textContent = 'Submit New Position';
+        document.getElementById('submitBtn').disabled = false;
+      }
+    }
+
+    // Event listeners
+    document.getElementById('connectWallet').addEventListener('click', connectWallet);
+    document.getElementById('clearBtn').addEventListener('click', clearSelection);
+    document.getElementById('submitBtn').addEventListener('click', submitPosition);
+
+    // Auto-connect if wallet already authorized
+    window.addEventListener('load', async () => {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect({ onlyIfTrusted: true });
+          walletAddress = resp.publicKey.toString();
+          walletConnected = true;
+          document.getElementById('connectWallet').style.display = 'none';
+          document.getElementById('walletInfo').style.display = 'block';
+          document.getElementById('walletAddress').textContent = walletAddress;
+          await loadGameData();
+        } catch (e) {
+          // User hasn't authorized yet
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+        }
+      } else {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        showMessage('Please install Phantom wallet to continue', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
