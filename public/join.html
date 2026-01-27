@@ -548,8 +548,11 @@
             </div>
 
             <div id="twitter-section" class="twitter-section">
-              <h3>Step 1: Enter your Twitter handle</h3>
-              <p class="info-text" style="margin-bottom: 12px;">Required for game notifications and payouts</p>
+              <h3>Step 1: Enter your Twitter/X handle</h3>
+              <div style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                <p style="color: #ffc107; font-weight: 600; margin-bottom: 4px;">&#9888; CRITICAL: Twitter/X Verification Required</p>
+                <p class="info-text" style="color: #e0e6ed; font-size: 0.85rem; margin: 0;">Your Twitter/X handle is <strong>essential</strong> for receiving game updates, turn notifications, and winner announcements. Without it, you won't know when it's your turn or if you've won!</p>
+              </div>
               <input type="text" id="twitter-handle" class="twitter-input" placeholder="@your_handle">
               <button id="verify-btn" class="wallet-btn verify" onclick="verifyTwitterHandle()">
                 Verify & Continue
@@ -596,10 +599,10 @@
             <div class="instructions">
               <strong>How to join:</strong>
               <ol>
-                <li>Enter your Twitter handle and click verify</li>
+                <li><strong>Verify your Twitter/X handle</strong> - This is how you'll receive all game updates!</li>
                 <li>Click "Open in Phantom" or "Open in Solflare"</li>
                 <li>Approve the payment transaction (${entryFeeSol} SOL)</li>
-                <li>You're in! You'll be notified when the game starts</li>
+                <li>You're in! Watch your Twitter/X DMs for turn notifications</li>
               </ol>
             </div>
           `;
