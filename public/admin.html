@@ -4,97 +4,608 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Dinghy Admin</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 100%);
+      min-height: 100vh;
+      color: #e0e6ed;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      color: #4a90e2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .status-item {
+      background: rgba(26, 42, 74, 0.6);
+      border: 1px solid rgba(74, 144, 226, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .status-item .label {
+      font-size: 0.75rem;
+      color: #8899aa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .status-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #6c757d;
+    }
+
+    .status-dot.ok {
+      background: #14f195;
+      box-shadow: 0 0 8px rgba(20, 241, 149, 0.5);
+    }
+
+    .status-dot.error {
+      background: #dc3545;
+      box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+    }
+
+    .sol-value {
+      color: #14f195;
+    }
+
+    /* Cards */
+    .card {
+      background: rgba(26, 42, 74, 0.6);
+      border: 1px solid rgba(74, 144, 226, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      color: #c0c8d0;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(74, 144, 226, 0.15);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      color: white;
+    }
+
+    .btn.primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn.success {
+      background: linear-gradient(135deg, #14f195 0%, #0eb87a 100%);
+      color: #0a1628;
+    }
+
+    .btn.success:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(20, 241, 149, 0.4);
+    }
+
+    .btn.danger {
+      background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+      color: white;
+    }
+
+    .btn.danger:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #c0c8d0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn.secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn.small {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    /* Login Card */
+    .login-card {
+      max-width: 400px;
+      margin: 100px auto;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      border: none;
+      margin-bottom: 24px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #e0e6ed;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+
+    .login-card input:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    .login-card .btn {
+      width: 100%;
+    }
+
+    /* Table */
+    .games-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .games-table th,
+    .games-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(74, 144, 226, 0.1);
+    }
+
+    .games-table th {
+      font-size: 0.75rem;
+      color: #8899aa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .games-table tr:hover {
+      background: rgba(74, 144, 226, 0.05);
+    }
+
+    .games-table .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge.waiting {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+
+    .badge.active {
+      background: rgba(20, 241, 149, 0.2);
+      color: #14f195;
+    }
+
+    .badge.repositioning {
+      background: rgba(33, 150, 243, 0.2);
+      color: #2196f3;
+    }
+
+    .badge.complete {
+      background: rgba(108, 117, 125, 0.2);
+      color: #adb5bd;
+    }
+
+    .badge.cancelled {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+    }
+
+    /* Game ID with copy */
+    .game-id {
+      font-family: 'Courier New', monospace;
+      color: #ffd700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .game-id:hover {
+      text-decoration: underline;
+    }
+
+    .copy-icon {
+      opacity: 0.5;
+      font-size: 0.8rem;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: #1a2a4a;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 24px;
+      color: #4a90e2;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #8899aa;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #e0e6ed;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(74, 144, 226, 0.15);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .empty-state p {
+      margin-bottom: 16px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #14f195;
+      color: #0a1628;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .games-table {
+        font-size: 0.85rem;
+      }
+
+      .games-table th,
+      .games-table td {
+        padding: 10px 8px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Battle Dinghy Admin</h1>
-
+    <!-- Login Section -->
     <div id="auth-section">
-      <div class="card">
+      <div class="card login-card">
         <h2>Admin Login</h2>
         <input type="password" id="api-key-input" placeholder="Enter Admin API Key">
         <button id="login-btn" class="btn primary">Login</button>
       </div>
     </div>
 
+    <!-- Dashboard -->
     <div id="dashboard" class="hidden">
-      <div class="status-row" id="status-row">
-        <div class="status-card">
-          <span class="status-indicator" id="server-status"></span>
-          <span>Server</span>
-        </div>
-        <div class="status-card">
-          <span class="status-indicator" id="db-status"></span>
-          <span>Database</span>
-        </div>
-        <div class="status-card">
-          <span class="status-indicator" id="twitter-status"></span>
-          <span>Twitter</span>
-        </div>
-        <div class="status-card">
-          <span id="escrow-balance">--</span>
-          <span>SOL</span>
+      <div class="header">
+        <h1>Battle Dinghy Admin</h1>
+        <div class="header-actions">
+          <button id="create-btn" class="btn success">+ New Game</button>
+          <button id="refresh-btn" class="btn secondary">Refresh</button>
+          <button id="logout-btn" class="btn secondary">Logout</button>
         </div>
       </div>
 
-      <button id="create-btn" class="btn primary large mb-4">Create New Game</button>
-      <button id="logout-btn" class="btn secondary mb-4" style="margin-left: 12px;">Logout</button>
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="label">Server</div>
+          <div class="value">
+            <span class="status-dot" id="server-status"></span>
+            <span id="server-text">--</span>
+          </div>
+        </div>
+        <div class="status-item">
+          <div class="label">Database</div>
+          <div class="value">
+            <span class="status-dot" id="db-status"></span>
+            <span id="db-text">--</span>
+          </div>
+        </div>
+        <div class="status-item">
+          <div class="label">Twitter</div>
+          <div class="value">
+            <span class="status-dot" id="twitter-status"></span>
+            <span id="twitter-text">--</span>
+          </div>
+        </div>
+        <div class="status-item">
+          <div class="label">Escrow Balance</div>
+          <div class="value sol-value" id="escrow-balance">-- SOL</div>
+        </div>
+        <div class="status-item">
+          <div class="label">Active Games</div>
+          <div class="value" id="active-games">--</div>
+        </div>
+        <div class="status-item">
+          <div class="label">Total Players</div>
+          <div class="value" id="total-players">--</div>
+        </div>
+      </div>
 
+      <!-- Games Table -->
       <div class="card">
         <h2>Games</h2>
-        <div id="games-table">
-          <div class="loading">Loading...</div>
+        <div id="games-container">
+          <div class="empty-state">Loading...</div>
         </div>
-      </div>
-    </div>
-
-    <div id="create-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>Create New Game</h2>
-        <form id="create-form">
-          <label>Entry Fee (SOL)</label>
-          <input type="number" name="entryFeeSol" value="0.1" min="0.0001" max="10" step="0.0001">
-
-          <label>Max Players</label>
-          <input type="number" name="maxPlayers" value="8" min="2" max="100">
-
-          <label>Ship Size</label>
-          <select name="shipSize">
-            <option value="1">Tiny (1 cell)</option>
-            <option value="2">Mid (2 cells)</option>
-            <option value="3">Giant (3 cells)</option>
-          </select>
-
-          <label>Shots Per Salvo</label>
-          <input type="number" name="shotsPerSalvo" value="5" min="3" max="15">
-
-          <label>Fill Deadline (minutes)</label>
-          <input type="number" name="fillDeadlineMinutes" value="60" min="5" max="1440">
-
-          <label>Reposition Window (minutes)</label>
-          <input type="number" name="repositionWindowMinutes" value="30" min="5" max="120">
-
-          <label>Custom Tweet (optional)</label>
-          <textarea name="customTweetText" maxlength="200" rows="2"></textarea>
-
-          <div class="modal-actions">
-            <button type="submit" class="btn primary">Create Game</button>
-            <button type="button" id="cancel-create" class="btn secondary">Cancel</button>
-          </div>
-        </form>
       </div>
     </div>
   </div>
 
-  <script src="/js/api.js"></script>
+  <!-- Create Game Modal -->
+  <div id="create-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Create New Game</h2>
+      <form id="create-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Entry Fee (SOL)</label>
+            <input type="number" name="entryFeeSol" value="0.1" min="0.001" max="10" step="0.001" required>
+          </div>
+          <div class="form-group">
+            <label>Max Players</label>
+            <input type="number" name="maxPlayers" value="8" min="2" max="100" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ship Size</label>
+            <select name="shipSize">
+              <option value="1">Tiny (1 cell)</option>
+              <option value="2" selected>Mid (2 cells)</option>
+              <option value="3">Giant (3 cells)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Shots Per Salvo</label>
+            <input type="number" name="shotsPerSalvo" value="5" min="1" max="15" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fill Deadline (minutes)</label>
+            <input type="number" name="fillDeadlineMinutes" value="60" min="5" max="1440" required>
+          </div>
+          <div class="form-group">
+            <label>Reposition Window (minutes)</label>
+            <input type="number" name="repositionWindowMinutes" value="30" min="5" max="120" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Custom Tweet (optional)</label>
+          <textarea name="customTweetText" maxlength="200" rows="2" placeholder="Optional announcement text..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancel-create" class="btn secondary">Cancel</button>
+          <button type="submit" class="btn success">Create Game</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
   <script>
+    const API_BASE = window.location.origin;
     let apiKey = localStorage.getItem('adminApiKey') || '';
 
+    // Toast notification
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(text, label = 'Copied!') {
+      navigator.clipboard.writeText(text).then(() => showToast(label));
+    }
+
+    // API helpers
+    async function apiCall(endpoint, options = {}) {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': apiKey,
+          ...options.headers
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || 'Request failed');
+      }
+      return res.json();
+    }
+
+    // Initialize
     if (apiKey) {
       showDashboard();
     }
 
+    // Login
     document.getElementById('login-btn').addEventListener('click', () => {
       apiKey = document.getElementById('api-key-input').value;
       if (apiKey) {
@@ -103,6 +614,11 @@
       }
     });
 
+    document.getElementById('api-key-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('login-btn').click();
+    });
+
+    // Logout
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('adminApiKey');
       apiKey = '';
@@ -110,6 +626,13 @@
       document.getElementById('dashboard').classList.add('hidden');
     });
 
+    // Refresh
+    document.getElementById('refresh-btn').addEventListener('click', async () => {
+      await Promise.all([loadStatus(), loadGames()]);
+      showToast('Refreshed!');
+    });
+
+    // Create modal
     document.getElementById('create-btn').addEventListener('click', () => {
       document.getElementById('create-modal').classList.remove('hidden');
     });
@@ -118,46 +641,80 @@
       document.getElementById('create-modal').classList.add('hidden');
     });
 
+    document.getElementById('create-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        document.getElementById('create-modal').classList.add('hidden');
+      }
+    });
+
+    // Create game form
     document.getElementById('create-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
-      const data = {
-        entryFeeSol: parseFloat(form.entryFeeSol.value),
-        maxPlayers: parseInt(form.maxPlayers.value),
-        shipSize: parseInt(form.shipSize.value),
-        shotsPerSalvo: parseInt(form.shotsPerSalvo.value),
-        fillDeadlineMinutes: parseInt(form.fillDeadlineMinutes.value),
-        repositionWindowMinutes: parseInt(form.repositionWindowMinutes.value),
-        customTweetText: form.customTweetText.value || undefined,
-      };
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
 
       try {
-        await api.admin.createGame(apiKey, data);
+        const data = {
+          entryFeeSol: parseFloat(form.entryFeeSol.value),
+          maxPlayers: parseInt(form.maxPlayers.value),
+          shipSize: parseInt(form.shipSize.value),
+          shotsPerSalvo: parseInt(form.shotsPerSalvo.value),
+          fillDeadlineMinutes: parseInt(form.fillDeadlineMinutes.value),
+          repositionWindowMinutes: parseInt(form.repositionWindowMinutes.value),
+          customTweetText: form.customTweetText.value || undefined,
+        };
+
+        const result = await apiCall('/api/admin/games', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
         document.getElementById('create-modal').classList.add('hidden');
         form.reset();
+        showToast('Game created: ' + result.gameId);
         loadGames();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Game';
       }
     });
 
     async function showDashboard() {
       document.getElementById('auth-section').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
-      await loadStatus();
-      await loadGames();
+      await Promise.all([loadStatus(), loadGames()]);
       setInterval(loadStatus, 30000);
       setInterval(loadGames, 30000);
     }
 
     async function loadStatus() {
       try {
-        const status = await api.admin.getStatus(apiKey);
-        setIndicator('server-status', status.server?.status === 'ok');
-        setIndicator('db-status', status.database?.status === 'ok');
-        setIndicator('twitter-status', status.twitter?.status === 'ok');
+        const status = await apiCall('/api/admin/status');
+
+        // Server
+        const serverOk = status.server?.status === 'ok';
+        document.getElementById('server-status').className = 'status-dot ' + (serverOk ? 'ok' : 'error');
+        document.getElementById('server-text').textContent = serverOk ? 'Online' : 'Offline';
+
+        // Database
+        const dbOk = status.database?.status === 'ok';
+        document.getElementById('db-status').className = 'status-dot ' + (dbOk ? 'ok' : 'error');
+        document.getElementById('db-text').textContent = dbOk ? 'Connected' : 'Error';
+
+        // Twitter
+        const twitterOk = status.twitter?.status === 'ok';
+        document.getElementById('twitter-status').className = 'status-dot ' + (twitterOk ? 'ok' : 'error');
+        document.getElementById('twitter-text').textContent = twitterOk ? 'Connected' : 'Not configured';
+
+        // Escrow
+        const balance = status.escrow?.balanceSol;
         document.getElementById('escrow-balance').textContent =
-          status.escrow?.balanceSol?.toFixed(4) || '--';
+          balance !== undefined ? balance.toFixed(4) + ' SOL' : 'N/A';
+
       } catch (err) {
         console.error('Status error:', err);
       }
@@ -165,38 +722,59 @@
 
     async function loadGames() {
       try {
-        const { games } = await api.admin.getGames(apiKey);
-        const container = document.getElementById('games-table');
+        const { games } = await apiCall('/api/admin/games');
+        const container = document.getElementById('games-container');
+
+        // Update stats
+        const activeGames = games.filter(g => ['waiting', 'active', 'repositioning'].includes(g.status)).length;
+        const totalPlayers = games.reduce((sum, g) => sum + (g.playerCount || 0), 0);
+        document.getElementById('active-games').textContent = activeGames;
+        document.getElementById('total-players').textContent = totalPlayers;
 
         if (games.length === 0) {
-          container.innerHTML = '<p class="text-secondary">No games yet</p>';
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>No games yet</p>
+              <button class="btn success" onclick="document.getElementById('create-btn').click()">Create your first game</button>
+            </div>
+          `;
           return;
         }
 
         container.innerHTML = `
-          <table>
+          <table class="games-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Game ID</th>
                 <th>Status</th>
                 <th>Players</th>
-                <th>Pool</th>
+                <th>Entry Fee</th>
+                <th>Prize Pool</th>
+                <th>Round</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               ${games.map(g => `
                 <tr>
-                  <td>${g.id}</td>
-                  <td>${g.status}</td>
-                  <td>${g.playerCount}/${g.maxPlayers}</td>
-                  <td>${g.prizePoolSol.toFixed(4)} SOL</td>
                   <td>
+                    <span class="game-id" onclick="copyJoinLink('${g.id}')" title="Click to copy join link">
+                      ${g.id}
+                      <span class="copy-icon">&#128203;</span>
+                    </span>
+                  </td>
+                  <td><span class="badge ${g.status}">${g.status}</span></td>
+                  <td>${g.playerCount || 0}/${g.maxPlayers}</td>
+                  <td>${g.entryFeeSol?.toFixed(3) || '--'} SOL</td>
+                  <td class="sol-value">${(g.prizePoolSol || 0).toFixed(4)} SOL</td>
+                  <td>${g.round || 0}</td>
+                  <td class="actions">
                     ${g.status === 'waiting' ? `
-                      <button class="btn secondary" onclick="cancelGame('${g.id}')">Cancel</button>
-                      ${g.playerCount >= 2 ? `<button class="btn primary" onclick="forceStart('${g.id}')">Start</button>` : ''}
+                      <button class="btn danger small" onclick="cancelGame('${g.id}')">Cancel</button>
+                      ${(g.playerCount || 0) >= 2 ? `<button class="btn primary small" onclick="forceStart('${g.id}')">Start</button>` : ''}
                     ` : ''}
-                    <a href="/game/${g.id}" class="btn secondary">View</a>
+                    <a href="/join/${g.id}" class="btn secondary small" target="_blank">Join Link</a>
+                    <a href="/game/${g.id}" class="btn secondary small" target="_blank">View</a>
                   </td>
                 </tr>
               `).join('')}
@@ -205,33 +783,40 @@
         `;
       } catch (err) {
         console.error('Games error:', err);
+        document.getElementById('games-container').innerHTML = `
+          <div class="empty-state">
+            <p>Failed to load games</p>
+            <button class="btn secondary" onclick="loadGames()">Retry</button>
+          </div>
+        `;
       }
+    }
+
+    function copyJoinLink(gameId) {
+      const url = `${window.location.origin}/join/${gameId}`;
+      copyToClipboard(url, 'Join link copied!');
     }
 
     async function cancelGame(gameId) {
       if (!confirm('Cancel this game? Players will be refunded.')) return;
       try {
-        await api.admin.cancelGame(apiKey, gameId);
+        await apiCall(`/api/admin/games/${gameId}/cancel`, { method: 'POST' });
+        showToast('Game cancelled');
         loadGames();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message);
       }
     }
 
     async function forceStart(gameId) {
       if (!confirm('Force start this game now?')) return;
       try {
-        await api.admin.forceStart(apiKey, gameId);
+        await apiCall(`/api/admin/games/${gameId}/force-start`, { method: 'POST' });
+        showToast('Game started');
         loadGames();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message);
       }
-    }
-
-    function setIndicator(id, ok) {
-      const el = document.getElementById(id);
-      el.classList.remove('ok', 'error');
-      el.classList.add(ok ? 'ok' : 'error');
     }
   </script>
 </body>
