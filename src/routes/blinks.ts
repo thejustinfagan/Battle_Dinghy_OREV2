@@ -229,15 +229,13 @@ router.post('/game/:gameId', actionsCorsMiddleware, async (req: Request, res: Re
     }
 
     // Get escrow wallet
-    if (!config.solana.escrowPrivateKey) {
+    if (!config.solana.escrowPublicKey) {
       return res.status(500).json({
-        error: { message: 'Escrow wallet not configured' },
+        error: { message: 'Escrow wallet not configured. Set ESCROW_WALLET_PUBLIC_KEY environment variable.' },
       });
     }
 
-    const escrowPublicKey = new PublicKey(
-      process.env.ESCROW_WALLET_PUBLIC_KEY || config.solana.escrowPrivateKey
-    );
+    const escrowPublicKey = new PublicKey(config.solana.escrowPublicKey);
 
     // Create transfer transaction
     const connection = new Connection(config.solana.rpcUrl, 'confirmed');
