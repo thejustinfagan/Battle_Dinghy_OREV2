@@ -142,10 +142,6 @@
       color: #c0c8d0;
     }
 
-    .twitter-section {
-      margin-bottom: 24px;
-    }
-
     .twitter-input {
       width: 100%;
       padding: 14px 16px;
@@ -169,7 +165,7 @@
       gap: 12px;
     }
 
-    .wallet-btn {
+    .btn {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -185,45 +181,55 @@
       color: white;
     }
 
-    .wallet-btn:disabled {
+    .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .wallet-btn.verify {
+    .btn.verify {
       background: linear-gradient(135deg, #1da1f2 0%, #0d8ecf 100%);
     }
 
-    .wallet-btn.verify:hover:not(:disabled) {
+    .btn.verify:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(29, 161, 242, 0.4);
     }
 
-    .wallet-btn.phantom {
+    .btn.phantom {
       background: linear-gradient(135deg, #ab9ff2 0%, #7c3aed 100%);
     }
 
-    .wallet-btn.phantom:hover:not(:disabled) {
+    .btn.phantom:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
     }
 
-    .wallet-btn.solflare {
+    .btn.solflare {
       background: linear-gradient(135deg, #fc8c03 0%, #e85d04 100%);
     }
 
-    .wallet-btn.solflare:hover:not(:disabled) {
+    .btn.solflare:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(232, 93, 4, 0.4);
     }
 
-    .wallet-btn.copy-link {
+    .btn.primary {
       background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
     }
 
-    .wallet-btn.copy-link:hover:not(:disabled) {
+    .btn.primary:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn.success {
+      background: linear-gradient(135deg, #14f195 0%, #0eb87a 100%);
+      color: #0a1628;
+    }
+
+    .btn.success:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(20, 241, 149, 0.4);
     }
 
     .divider {
@@ -322,25 +328,6 @@
       opacity: 1;
     }
 
-    .instructions {
-      background: rgba(74, 144, 226, 0.1);
-      border: 1px solid rgba(74, 144, 226, 0.3);
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 16px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
-
-    .instructions ol {
-      margin: 8px 0 0 20px;
-      padding: 0;
-    }
-
-    .instructions li {
-      margin-bottom: 4px;
-    }
-
     .step-indicator {
       display: flex;
       justify-content: center;
@@ -414,6 +401,127 @@
       color: #8899aa;
       margin-bottom: 12px;
     }
+
+    /* Ship Placement Grid */
+    .grid-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .grid-cell {
+      width: 48px;
+      height: 48px;
+      background: rgba(74, 144, 226, 0.15);
+      border: 2px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .grid-cell:hover:not(.taken):not(.selected) {
+      background: rgba(74, 144, 226, 0.3);
+      border-color: #4a90e2;
+    }
+
+    .grid-cell.selected {
+      background: rgba(20, 241, 149, 0.3);
+      border-color: #14f195;
+      box-shadow: 0 0 10px rgba(20, 241, 149, 0.5);
+    }
+
+    .grid-cell.taken {
+      background: rgba(220, 53, 69, 0.2);
+      border-color: rgba(220, 53, 69, 0.4);
+      cursor: not-allowed;
+    }
+
+    .grid-cell.taken::after {
+      content: '⚓';
+      opacity: 0.5;
+    }
+
+    .grid-legend {
+      display: flex;
+      gap: 20px;
+      font-size: 0.8rem;
+      color: #8899aa;
+      margin-top: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    .legend-dot.available {
+      background: rgba(74, 144, 226, 0.3);
+      border: 1px solid rgba(74, 144, 226, 0.5);
+    }
+
+    .legend-dot.selected {
+      background: rgba(20, 241, 149, 0.3);
+      border: 1px solid #14f195;
+    }
+
+    .legend-dot.taken {
+      background: rgba(220, 53, 69, 0.2);
+      border: 1px solid rgba(220, 53, 69, 0.4);
+    }
+
+    .selected-position {
+      background: rgba(20, 241, 149, 0.1);
+      border: 1px solid rgba(20, 241, 149, 0.4);
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .game-link-box {
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.4);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .game-link-box p {
+      font-size: 0.85rem;
+      color: #8899aa;
+      margin-bottom: 8px;
+    }
+
+    .game-link-box a {
+      color: #4a90e2;
+      word-break: break-all;
+    }
+
+    .game-link-box .btn {
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
@@ -445,22 +553,23 @@
 
     let verificationToken = null;
     let verifiedHandle = null;
+    let selectedPosition = null;
     let connectedWallet = null;
     let gameConfig = null;
+    let takenPositions = [];
 
-    // Detect if on mobile
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast('Link copied!');
+        showToast('Copied!');
       }).catch(() => {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -468,10 +577,11 @@
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        showToast('Link copied!');
+        showToast('Copied!');
       });
     }
 
+    // Step 1: Verify Twitter handle
     async function verifyTwitterHandle() {
       const handleInput = document.getElementById('twitter-handle');
       const verifyBtn = document.getElementById('verify-btn');
@@ -501,15 +611,14 @@
         verificationToken = data.token;
         verifiedHandle = data.twitterHandle;
 
-        // Show wallet buttons
+        // Move to step 2
         document.getElementById('step1').classList.remove('active');
         document.getElementById('step1').classList.add('complete');
         document.getElementById('step2').classList.add('active');
         document.getElementById('twitter-section').classList.add('hidden');
-        document.getElementById('wallet-section').classList.remove('hidden');
+        document.getElementById('placement-section').classList.remove('hidden');
         document.getElementById('verified-handle').textContent = `@${verifiedHandle}`;
 
-        updateWalletLinks();
         showToast('Handle verified!');
 
       } catch (err) {
@@ -519,22 +628,51 @@
       }
     }
 
-    function updateWalletLinks() {
-      const actionUrl = `${API_BASE}/api/actions/game/${gameId}?token=${verificationToken}`;
-      const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(actionUrl)}`;
-      const solflareDeepLink = `https://solflare.com/ul/v1/browse/${encodeURIComponent(actionUrl)}`;
+    // Step 2: Select ship position
+    function selectPosition(row, col) {
+      const posKey = `${row},${col}`;
 
-      // Mobile deep links
-      const phantomMobileLink = document.getElementById('phantom-mobile-link');
-      const solflareMobileLink = document.getElementById('solflare-mobile-link');
-      if (phantomMobileLink) phantomMobileLink.href = phantomDeepLink;
-      if (solflareMobileLink) solflareMobileLink.href = solflareDeepLink;
+      if (takenPositions.includes(posKey)) {
+        showToast('This position is already taken!');
+        return;
+      }
 
-      const copyBtn = document.getElementById('copy-link-btn');
-      if (copyBtn) copyBtn.onclick = () => copyToClipboard(actionUrl);
+      // Clear previous selection
+      document.querySelectorAll('.grid-cell.selected').forEach(cell => {
+        cell.classList.remove('selected');
+        cell.textContent = '';
+      });
+
+      // Select new position
+      const cell = document.querySelector(`[data-pos="${posKey}"]`);
+      cell.classList.add('selected');
+      cell.textContent = '🚤';
+      selectedPosition = { row, col };
+
+      // Show confirm button
+      document.getElementById('confirm-position-btn').classList.remove('hidden');
+      document.getElementById('selected-pos-text').textContent = `Row ${row + 1}, Column ${col + 1}`;
+      document.getElementById('selected-pos-display').classList.remove('hidden');
     }
 
-    // Connect to Phantom browser extension
+    function confirmPosition() {
+      if (!selectedPosition) {
+        showToast('Please select a position first');
+        return;
+      }
+
+      // Move to step 3
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step2').classList.add('complete');
+      document.getElementById('step3').classList.add('active');
+      document.getElementById('placement-section').classList.add('hidden');
+      document.getElementById('payment-section').classList.remove('hidden');
+      document.getElementById('final-position').textContent = `Row ${selectedPosition.row + 1}, Column ${selectedPosition.col + 1}`;
+
+      showToast('Position confirmed!');
+    }
+
+    // Step 3: Connect wallet
     async function connectPhantom() {
       const btn = document.getElementById('connect-phantom-btn');
 
@@ -551,9 +689,8 @@
         const resp = await window.solana.connect();
         connectedWallet = resp.publicKey.toString();
 
-        // Show connected state
         document.getElementById('wallet-connect-section').classList.add('hidden');
-        document.getElementById('wallet-connected-section').classList.remove('hidden');
+        document.getElementById('wallet-pay-section').classList.remove('hidden');
         document.getElementById('connected-address').textContent =
           connectedWallet.slice(0, 8) + '...' + connectedWallet.slice(-8);
 
@@ -569,8 +706,8 @@
     async function payWithWallet() {
       const btn = document.getElementById('pay-btn');
 
-      if (!connectedWallet || !verificationToken) {
-        showToast('Please connect wallet first');
+      if (!connectedWallet || !verificationToken || !selectedPosition) {
+        showToast('Missing required info');
         return;
       }
 
@@ -578,17 +715,19 @@
       btn.textContent = 'Processing...';
 
       try {
-        // Get transaction from server
+        // Include ship position in the request
         const res = await fetch(`${API_BASE}/api/actions/game/${gameId}?token=${verificationToken}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ account: connectedWallet })
+          body: JSON.stringify({
+            account: connectedWallet,
+            shipPosition: selectedPosition
+          })
         });
 
         const data = await res.json();
 
         if (!res.ok) {
-          // API returns { error: { message: "..." } } format
           const errorMsg = data.error?.message || data.error || data.message || 'Failed to create transaction';
           throw new Error(errorMsg);
         }
@@ -605,11 +744,19 @@
 
         showToast('Payment sent! Joining game...');
 
-        // Show success
-        document.getElementById('wallet-connected-section').innerHTML = `
+        // Show success with game link
+        const gameUrl = `${window.location.origin}/game/${gameId}`;
+        document.getElementById('wallet-pay-section').innerHTML = `
           <div class="success-message">
-            <p style="font-size: 1.2rem; margin-bottom: 8px;">You're in!</p>
-            <p style="font-size: 0.9rem;">Watch your Twitter DMs for game updates</p>
+            <p style="font-size: 1.3rem; margin-bottom: 8px;">You're in!</p>
+            <p style="font-size: 0.9rem; color: #c0c8d0;">Your dinghy is deployed at Row ${selectedPosition.row + 1}, Column ${selectedPosition.col + 1}</p>
+          </div>
+          <div class="game-link-box">
+            <p>Access your ship anytime by connecting your wallet at:</p>
+            <a href="${gameUrl}" target="_blank">${gameUrl}</a>
+            <button class="btn primary" onclick="copyToClipboard('${gameUrl}')" style="width: 100%;">
+              Copy Game Link
+            </button>
           </div>
         `;
 
@@ -641,14 +788,15 @@
         const game = await res.json();
         gameConfig = game;
 
-        // Get values with fallbacks for different API response formats
         const currentPlayers = game.playerCount || game.currentPlayers || 0;
         const maxPlayers = game.maxPlayers || 10;
         const spotsLeft = maxPlayers - currentPlayers;
         const entryFeeSol = game.entryFeeSol || (game.entryFeeLamports / 1000000000) || 0.001;
         gameConfig.entryFeeSol = entryFeeSol;
 
-        // Determine status
+        // Get taken positions (if API provides them)
+        takenPositions = game.takenPositions || [];
+
         let statusClass = 'waiting';
         let statusText = 'Open for Players';
         let canJoin = true;
@@ -669,37 +817,74 @@
 
         let joinHtml = '';
         if (canJoin) {
-          // Check if Phantom extension is available (desktop)
           const hasPhantomExtension = window.solana && window.solana.isPhantom;
+
+          // Build grid HTML
+          let gridHtml = '';
+          for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 5; col++) {
+              const posKey = `${row},${col}`;
+              const isTaken = takenPositions.includes(posKey);
+              gridHtml += `<div class="grid-cell ${isTaken ? 'taken' : ''}" data-pos="${posKey}" onclick="selectPosition(${row}, ${col})"></div>`;
+            }
+          }
 
           joinHtml = `
             <div class="step-indicator">
               <div id="step1" class="step active">1</div>
               <div id="step2" class="step">2</div>
+              <div id="step3" class="step">3</div>
             </div>
 
-            <div id="twitter-section" class="twitter-section">
+            <!-- Step 1: Twitter Handle -->
+            <div id="twitter-section">
               <h3>Step 1: Enter your Twitter/X handle</h3>
-              <div style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-                <p style="color: #ffc107; font-weight: 600; margin-bottom: 4px;">&#9888; CRITICAL: Twitter/X Verification Required</p>
-                <p class="info-text" style="color: #e0e6ed; font-size: 0.85rem; margin: 0;">Your Twitter/X handle is <strong>essential</strong> for receiving game updates, turn notifications, and winner announcements. Without it, you won't know when it's your turn or if you've won!</p>
-              </div>
+              <p class="info-text" style="margin-bottom: 16px;">This identifies you in the game and helps other players recognize you.</p>
               <input type="text" id="twitter-handle" class="twitter-input" placeholder="@your_handle">
-              <button id="verify-btn" class="wallet-btn verify" onclick="verifyTwitterHandle()">
+              <button id="verify-btn" class="btn verify" onclick="verifyTwitterHandle()" style="width: 100%;">
                 Verify & Continue
               </button>
             </div>
 
-            <div id="wallet-section" class="wallet-buttons hidden">
+            <!-- Step 2: Ship Placement -->
+            <div id="placement-section" class="hidden">
               <div class="success-message">
                 Verified as <span id="verified-handle"></span>
               </div>
-              <h3 style="margin-bottom: 16px; color: #c0c8d0;">Step 2: Pay ${entryFeeSol} SOL</h3>
+              <h3>Step 2: Choose Your Starting Position</h3>
+              <p class="info-text" style="margin-bottom: 16px;">Place your dinghy strategically! This is where your ship starts.</p>
+
+              <div class="grid-container">
+                <div class="grid">
+                  ${gridHtml}
+                </div>
+                <div class="grid-legend">
+                  <div class="legend-item"><span class="legend-dot available"></span> Available</div>
+                  <div class="legend-item"><span class="legend-dot selected"></span> Selected</div>
+                  <div class="legend-item"><span class="legend-dot taken"></span> Taken</div>
+                </div>
+              </div>
+
+              <div id="selected-pos-display" class="selected-position hidden">
+                Selected: <strong id="selected-pos-text"></strong>
+              </div>
+
+              <button id="confirm-position-btn" class="btn success hidden" onclick="confirmPosition()" style="width: 100%;">
+                Confirm Position
+              </button>
+            </div>
+
+            <!-- Step 3: Payment -->
+            <div id="payment-section" class="hidden">
+              <div class="success-message">
+                Verified as <span style="color: #14f195;">@${verifiedHandle || ''}</span><br>
+                <span style="font-size: 0.85rem; color: #c0c8d0;">Ship position: <span id="final-position"></span></span>
+              </div>
+              <h3>Step 3: Pay ${entryFeeSol} SOL to Join</h3>
 
               ${hasPhantomExtension && !isMobile ? `
-                <!-- Desktop: Browser Extension -->
                 <div id="wallet-connect-section">
-                  <button id="connect-phantom-btn" class="wallet-btn phantom" onclick="connectPhantom()">
+                  <button id="connect-phantom-btn" class="btn phantom" onclick="connectPhantom()" style="width: 100%;">
                     <svg width="24" height="24" viewBox="0 0 128 128" fill="none">
                       <circle cx="64" cy="64" r="64" fill="url(#phantom-grad)"/>
                       <path d="M110.5 65.7C110.5 89.2 91.5 108.2 68.1 108.2H37C35.6 108.2 34.6 107.1 34.6 105.8V67.6C34.6 66.2 35.6 65.1 37 65.1H68.6C70 65.1 71.1 64 71.1 62.7V62.1C71.1 60.7 70 59.6 68.6 59.6H37C35.6 59.6 34.6 58.5 34.6 57.2V22.2C34.6 20.9 35.6 19.8 37 19.8H68.1C91.5 19.8 110.5 38.8 110.5 62.3V65.7Z" fill="white"/>
@@ -708,72 +893,34 @@
                     Connect Phantom
                   </button>
                 </div>
-                <div id="wallet-connected-section" class="hidden">
+                <div id="wallet-pay-section" class="hidden">
                   <div class="wallet-connected">
                     <p style="font-size: 0.75rem; color: #8899aa; margin-bottom: 4px;">Connected Wallet</p>
                     <p class="address" id="connected-address"></p>
                   </div>
-                  <button id="pay-btn" class="wallet-btn phantom" onclick="payWithWallet()">
+                  <button id="pay-btn" class="btn phantom" onclick="payWithWallet()" style="width: 100%;">
                     Pay ${entryFeeSol} SOL
                   </button>
                 </div>
               ` : `
-                <!-- Mobile: Deep Links -->
-                <a id="phantom-mobile-link" href="#" class="wallet-btn phantom" target="_blank" rel="noopener">
-                  <svg width="24" height="24" viewBox="0 0 128 128" fill="none">
-                    <circle cx="64" cy="64" r="64" fill="url(#phantom-grad2)"/>
-                    <path d="M110.5 65.7C110.5 89.2 91.5 108.2 68.1 108.2H37C35.6 108.2 34.6 107.1 34.6 105.8V67.6C34.6 66.2 35.6 65.1 37 65.1H68.6C70 65.1 71.1 64 71.1 62.7V62.1C71.1 60.7 70 59.6 68.6 59.6H37C35.6 59.6 34.6 58.5 34.6 57.2V22.2C34.6 20.9 35.6 19.8 37 19.8H68.1C91.5 19.8 110.5 38.8 110.5 62.3V65.7Z" fill="white"/>
-                    <defs><linearGradient id="phantom-grad2" x1="64" y1="0" x2="64" y2="128"><stop stop-color="#534BB1"/><stop offset="1" stop-color="#551BF9"/></linearGradient></defs>
-                  </svg>
-                  Open in Phantom App
-                </a>
-                <a id="solflare-mobile-link" href="#" class="wallet-btn solflare" target="_blank" rel="noopener">
-                  <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="16" fill="#FC6C04"/>
-                    <path d="M16 6L22 12L16 18L10 12L16 6Z" fill="white"/>
-                    <path d="M16 14L22 20L16 26L10 20L16 14Z" fill="white" fill-opacity="0.6"/>
-                  </svg>
-                  Open in Solflare App
-                </a>
-              `}
-
-              <button id="copy-link-btn" class="wallet-btn copy-link">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                Copy Blinks URL
-              </button>
-
-              ${hasPhantomExtension && !isMobile ? `
-                <div class="mobile-links">
-                  <p>On mobile? Use these links:</p>
-                  <a id="phantom-mobile-link" href="#" class="wallet-btn phantom" style="font-size: 0.9rem; padding: 10px 16px;" target="_blank" rel="noopener">
-                    Phantom App
+                <div id="wallet-connect-section">
+                  <p class="info-text" style="margin-bottom: 16px;">Open in your wallet app to complete payment:</p>
+                  <a id="phantom-mobile-link" href="#" class="btn phantom" target="_blank" rel="noopener" style="width: 100%;">
+                    Open in Phantom
                   </a>
-                  <a id="solflare-mobile-link" href="#" class="wallet-btn solflare" style="font-size: 0.9rem; padding: 10px 16px; margin-top: 8px;" target="_blank" rel="noopener">
-                    Solflare App
+                  <a id="solflare-mobile-link" href="#" class="btn solflare" target="_blank" rel="noopener" style="width: 100%; margin-top: 12px;">
+                    Open in Solflare
                   </a>
                 </div>
-              ` : ''}
+                <div id="wallet-pay-section" class="hidden"></div>
+              `}
             </div>
 
             <div class="divider"><span>Need a wallet?</span></div>
-
             <p class="info-text">
               <a href="https://phantom.app/download" target="_blank">Download Phantom</a> or
               <a href="https://solflare.com/download" target="_blank">Solflare</a>
             </p>
-
-            <div class="instructions">
-              <strong>How to join:</strong>
-              <ol>
-                <li><strong>Verify your Twitter/X handle</strong> - This is how you'll receive all game updates!</li>
-                <li>${hasPhantomExtension && !isMobile ? 'Connect your Phantom wallet' : 'Open in your wallet app'}</li>
-                <li>Approve the payment transaction (${entryFeeSol} SOL)</li>
-                <li>You're in! Watch your Twitter/X DMs for turn notifications</li>
-              </ol>
-            </div>
           `;
         } else {
           joinHtml = `
@@ -809,6 +956,9 @@
           </div>
         `;
 
+        // Update mobile deep links if needed
+        updateMobileLinks();
+
       } catch (err) {
         console.error('Error loading game:', err);
         content.innerHTML = `
@@ -821,7 +971,27 @@
       }
     }
 
-    // Load game info on page load
+    function updateMobileLinks() {
+      // Will be called after position is confirmed to update deep links with position data
+      if (!verificationToken || !selectedPosition) return;
+
+      const actionUrl = `${API_BASE}/api/actions/game/${gameId}?token=${verificationToken}&shipRow=${selectedPosition.row}&shipCol=${selectedPosition.col}`;
+      const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(actionUrl)}`;
+      const solflareDeepLink = `https://solflare.com/ul/v1/browse/${encodeURIComponent(actionUrl)}`;
+
+      const phantomLink = document.getElementById('phantom-mobile-link');
+      const solflareLink = document.getElementById('solflare-mobile-link');
+      if (phantomLink) phantomLink.href = phantomDeepLink;
+      if (solflareLink) solflareLink.href = solflareDeepLink;
+    }
+
+    // Override confirmPosition to also update mobile links
+    const originalConfirmPosition = confirmPosition;
+    confirmPosition = function() {
+      originalConfirmPosition();
+      updateMobileLinks();
+    };
+
     loadGameInfo();
   </script>
 </body>
