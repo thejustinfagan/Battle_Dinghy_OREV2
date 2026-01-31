@@ -5,15 +5,187 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Battle Dinghy Game</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .wallet-prompt {
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .wallet-prompt h3 {
+      color: #4a90e2;
+      margin-bottom: 12px;
+    }
+    .wallet-prompt p {
+      color: #8899aa;
+      margin-bottom: 16px;
+    }
+    .btn-wallet {
+      background: linear-gradient(135deg, #ab9ff2 0%, #7c3aed 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-wallet:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    }
+    .btn-wallet:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .wallet-connected {
+      background: rgba(20, 241, 149, 0.1);
+      border: 1px solid rgba(20, 241, 149, 0.4);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .wallet-connected .address {
+      font-family: monospace;
+      color: #14f195;
+    }
+    .wallet-connected .disconnect {
+      color: #8899aa;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .wallet-connected .disconnect:hover {
+      color: #dc3545;
+    }
+    .player-info {
+      background: rgba(20, 241, 149, 0.1);
+      border: 1px solid rgba(20, 241, 149, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .player-info h4 {
+      color: #14f195;
+      margin-bottom: 8px;
+    }
+    .player-info .twitter-handle {
+      color: #1da1f2;
+      font-weight: 600;
+    }
+    .player-info .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .player-info .status.alive {
+      background: rgba(20, 241, 149, 0.2);
+      color: #14f195;
+    }
+    .player-info .status.eliminated {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+    }
+    .spectator-notice {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      color: #ffc107;
+      margin-bottom: 20px;
+    }
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .game-header h2 {
+      margin: 0;
+      color: #ffd700;
+      font-family: monospace;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-badge.waiting { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+    .status-badge.active { background: rgba(20, 241, 149, 0.2); color: #14f195; }
+    .status-badge.repositioning { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
+    .status-badge.complete { background: rgba(108, 117, 125, 0.2); color: #adb5bd; }
+    .status-badge.cancelled { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+    .game-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .game-stats .stat {
+      text-align: center;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    .game-stats .stat-label {
+      font-size: 0.75rem;
+      color: #8899aa;
+      text-transform: uppercase;
+    }
+    .game-stats .stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #e0e6ed;
+    }
+    .winner-banner {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .winner-banner h2 {
+      color: #ffd700;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .winner-banner p {
+      color: #e0e6ed;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1 class="text-center">Battle Dinghy</h1>
 
+    <!-- Wallet Connection -->
+    <div id="wallet-section"></div>
+
+    <!-- Game Status -->
     <div id="game-status" class="card">
       <div class="loading">Loading game...</div>
     </div>
 
+    <!-- Board Section -->
     <div id="board-section" class="card hidden">
       <h2 id="board-title">Game Board</h2>
       <div id="board"></div>
@@ -24,6 +196,7 @@
       </div>
     </div>
 
+    <!-- Reposition Section -->
     <div id="reposition-section" class="card hidden">
       <h2>Reposition Your Ship</h2>
       <p class="text-secondary mb-4">Time remaining: <span id="time-remaining">--:--</span></p>
@@ -32,8 +205,8 @@
       <p id="reposition-status" class="text-secondary mt-4"></p>
     </div>
 
+    <!-- Results Section -->
     <div id="results-section" class="card hidden">
-      <h2>Game Complete</h2>
       <div id="results-content"></div>
     </div>
   </div>
@@ -48,53 +221,164 @@
     let repositionBoard = null;
     let gameData = null;
     let newPosition = [];
+    let isPlayer = false;
 
     async function init() {
-      try {
-        wallet = await connectWallet().catch(() => null);
-      } catch {}
+      renderWalletSection();
       await loadGame();
       setInterval(loadGame, 10000);
+    }
+
+    function renderWalletSection() {
+      const section = document.getElementById('wallet-section');
+
+      if (wallet) {
+        section.innerHTML = `
+          <div class="wallet-connected">
+            <div>
+              <span style="color: #8899aa; font-size: 0.85rem;">Connected:</span>
+              <span class="address">${wallet.publicKey.slice(0, 6)}...${wallet.publicKey.slice(-4)}</span>
+            </div>
+            <button class="disconnect" onclick="handleDisconnect()">Disconnect</button>
+          </div>
+        `;
+      } else {
+        section.innerHTML = `
+          <div class="wallet-prompt">
+            <h3>Connect Your Wallet</h3>
+            <p>Connect your wallet to see your ship and make moves</p>
+            <button class="btn-wallet" onclick="handleConnect()">
+              <svg width="20" height="20" viewBox="0 0 128 128" fill="none">
+                <circle cx="64" cy="64" r="64" fill="url(#pg)"/>
+                <path d="M110.5 65.7C110.5 89.2 91.5 108.2 68.1 108.2H37C35.6 108.2 34.6 107.1 34.6 105.8V67.6C34.6 66.2 35.6 65.1 37 65.1H68.6C70 65.1 71.1 64 71.1 62.7V62.1C71.1 60.7 70 59.6 68.6 59.6H37C35.6 59.6 34.6 58.5 34.6 57.2V22.2C34.6 20.9 35.6 19.8 37 19.8H68.1C91.5 19.8 110.5 38.8 110.5 62.3V65.7Z" fill="white"/>
+                <defs><linearGradient id="pg" x1="64" y1="0" x2="64" y2="128"><stop stop-color="#534BB1"/><stop offset="1" stop-color="#551BF9"/></linearGradient></defs>
+              </svg>
+              Connect Phantom
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    async function handleConnect() {
+      const btn = document.querySelector('.btn-wallet');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Connecting...';
+      }
+
+      try {
+        wallet = await connectWallet();
+        renderWalletSection();
+        await loadGame();
+      } catch (err) {
+        alert(err.message);
+        renderWalletSection();
+      }
+    }
+
+    function handleDisconnect() {
+      disconnectWallet();
+      wallet = null;
+      isPlayer = false;
+      renderWalletSection();
+      loadGame();
     }
 
     async function loadGame() {
       try {
         const walletAddr = wallet?.publicKey;
         gameData = await api.getGameStatus(gameId, walletAddr);
+        isPlayer = !!gameData.myStatus;
         renderGame();
       } catch (err) {
-        document.getElementById('game-status').innerHTML = `<p>Error: ${err.message}</p>`;
+        document.getElementById('game-status').innerHTML = `
+          <div class="error-message">
+            <h3 style="color: #dc3545;">Error Loading Game</h3>
+            <p>${err.message}</p>
+          </div>
+        `;
       }
     }
 
     function renderGame() {
       const g = gameData;
 
-      // Status card
-      const statusMap = {
-        waiting: 'Waiting for players',
-        active: 'Round in progress',
-        repositioning: 'Repositioning phase',
-        complete: 'Game complete',
-        cancelled: 'Game cancelled',
+      // Status labels
+      const statusLabels = {
+        waiting: 'Waiting for Players',
+        active: 'Round in Progress',
+        repositioning: 'Repositioning Phase',
+        complete: 'Game Complete',
+        cancelled: 'Game Cancelled',
       };
 
+      // Player info section
+      let playerInfoHtml = '';
+      if (wallet && !isPlayer && g.status === 'waiting') {
+        playerInfoHtml = `
+          <div class="spectator-notice">
+            Your wallet is not registered for this game.
+            <a href="/join/${gameId}" style="color: #ffc107; text-decoration: underline;">Join this game</a>
+          </div>
+        `;
+      } else if (wallet && !isPlayer) {
+        playerInfoHtml = `
+          <div class="spectator-notice">
+            You are viewing as a spectator. Your wallet is not in this game.
+          </div>
+        `;
+      } else if (isPlayer) {
+        const status = g.myStatus.isEliminated ? 'eliminated' : 'alive';
+        playerInfoHtml = `
+          <div class="player-info">
+            <h4>Your Ship</h4>
+            ${g.myStatus.twitterHandle ? `<p>Playing as <span class="twitter-handle">@${g.myStatus.twitterHandle}</span></p>` : ''}
+            <span class="status ${status}">${status === 'alive' ? 'Still Afloat!' : 'Eliminated'}</span>
+            ${g.myStatus.position ? `<p style="margin-top: 8px; font-size: 0.85rem; color: #8899aa;">Position: Row ${Math.floor(g.myStatus.position[0]/5)+1}, Col ${(g.myStatus.position[0]%5)+1}</p>` : ''}
+          </div>
+        `;
+      }
+
+      // Game status card
       document.getElementById('game-status').innerHTML = `
-        <h2>${g.gameId}</h2>
-        <p><strong>Status:</strong> ${statusMap[g.status]}</p>
-        <p><strong>Round:</strong> ${g.round} - <strong>Players:</strong> ${g.playerCount}/${g.maxPlayers}</p>
-        ${g.deadline ? `<p><strong>Deadline:</strong> ${new Date(g.deadline).toLocaleTimeString()}</p>` : ''}
-        ${g.myStatus ? `<p><strong>Your status:</strong> ${g.myStatus.isEliminated ? 'Eliminated' : 'Alive'}</p>` : ''}
+        <div class="game-header">
+          <h2>${g.gameId}</h2>
+          <span class="status-badge ${g.status}">${statusLabels[g.status]}</span>
+        </div>
+        ${playerInfoHtml}
+        <div class="game-stats">
+          <div class="stat">
+            <div class="stat-label">Round</div>
+            <div class="stat-value">${g.round || 0}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Players</div>
+            <div class="stat-value">${g.playerCount || 0}/${g.maxPlayers || '?'}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Alive</div>
+            <div class="stat-value">${g.aliveCount || g.playerCount || 0}</div>
+          </div>
+          ${g.deadline ? `
+          <div class="stat">
+            <div class="stat-label">Deadline</div>
+            <div class="stat-value" style="font-size: 0.9rem;">${new Date(g.deadline).toLocaleTimeString()}</div>
+          </div>
+          ` : ''}
+        </div>
       `;
 
       // Show board if game has started
       if (g.status !== 'waiting') {
         show('board-section');
         renderBoard();
+      } else {
+        hide('board-section');
       }
 
       // Repositioning
-      if (g.status === 'repositioning' && g.myStatus && !g.myStatus.isEliminated) {
+      if (g.status === 'repositioning' && isPlayer && !g.myStatus.isEliminated) {
         show('reposition-section');
         initRepositionBoard();
         updateTimer(g.deadline);
@@ -106,10 +390,23 @@
       if (g.status === 'complete') {
         show('results-section');
         const isWinner = g.winners?.includes(wallet?.publicKey);
-        document.getElementById('results-content').innerHTML = `
-          <p>${g.winners?.length === 1 ? 'Winner' : 'Winners'}: ${g.winners?.length || 0}</p>
-          ${isWinner ? '<p style="color: var(--success); font-size: 1.5rem;">You won!</p>' : ''}
-        `;
+
+        if (isWinner) {
+          document.getElementById('results-content').innerHTML = `
+            <div class="winner-banner">
+              <h2>You Won!</h2>
+              <p>Congratulations, Captain! Your dinghy survived the battle!</p>
+            </div>
+          `;
+        } else {
+          document.getElementById('results-content').innerHTML = `
+            <h2>Game Over</h2>
+            <p>${g.winners?.length === 1 ? 'Winner' : 'Winners'}: ${g.winners?.length || 0} player(s)</p>
+            ${isPlayer ? '<p style="color: #8899aa;">Better luck next time!</p>' : ''}
+          `;
+        }
+      } else {
+        hide('results-section');
       }
     }
 
@@ -124,7 +421,7 @@
         board.showShots(gameData.lastRound.shots);
       }
 
-      // Show my ship
+      // Show my ship if I'm a player
       if (gameData.myStatus) {
         board.showShip(gameData.myStatus.position, 'ship');
         board.showHits(gameData.myStatus.hits);
@@ -143,7 +440,7 @@
     function initRepositionBoard() {
       if (!repositionBoard) {
         repositionBoard = new GameBoard('reposition-board', {
-          shipSize: gameData.config.shipSize,
+          shipSize: gameData.config?.shipSize || 2,
           interactive: true,
           onSelect: (cells) => {
             newPosition = cells;
